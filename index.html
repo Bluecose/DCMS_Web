@@ -1,0 +1,2635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediTrack Diagnostic Center — Lab & Sample Tracking System</title>
+  <style>
+    :root {
+      --primary: #0066CC;
+      --primary-hover: #0052A3;
+      --primary-light: #E0F2FE;
+      --primary-soft: #EBF4FF;
+      --navy: #0F172A;
+      --slate: #475569;
+      --muted: #64748B;
+      --border: #E2E8F0;
+      --bg: #F4F7FB;
+      --white: #FFFFFF;
+      --success-bg: #DCFCE7;
+      --success-text: #15803D;
+      --warning-bg: #FEF3C7;
+      --warning-text: #B45309;
+      --danger-bg: #FEE2E2;
+      --danger-text: #B91C1C;
+      --purple-bg: #F3E8FF;
+      --purple-text: #7E22CE;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 6px 20px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.14);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--navy);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Prototype Preview Bar */
+    .preview-bar {
+      background: #0F172A;
+      color: #F8FAFC;
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 13px;
+      z-index: 100;
+      border-bottom: 1px solid #1E293B;
+    }
+
+    .preview-bar-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .preview-bar-badge {
+      background: var(--primary);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .preview-bar-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .preview-btn {
+      background: #1E293B;
+      color: #E2E8F0;
+      border: 1px solid #334155;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .preview-btn:hover {
+      background: #334155;
+      color: #FFF;
+    }
+
+    .preview-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #FFF;
+    }
+
+    /* Utility Classes */
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .gap-4 { gap: 16px; }
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 12px; }
+    .mt-4 { margin-top: 16px; }
+    .mb-3 { margin-bottom: 12px; }
+    .mb-4 { margin-bottom: 16px; }
+    .w-full { width: 100%; }
+
+    /* Buttons & Inputs */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #FFF;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .btn-outline {
+      background: #FFF;
+      color: var(--navy);
+      border-color: var(--border);
+    }
+    .btn-outline:hover {
+      background: #F8FAFC;
+      border-color: #CBD5E1;
+    }
+
+    .btn-success {
+      background: #16A34A;
+      color: #FFF;
+    }
+    .btn-success:hover { background: #15803D; }
+
+    .btn-danger {
+      background: #DC2626;
+      color: #FFF;
+    }
+    .btn-danger:hover { background: #B91C1C; }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #CBD5E1;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      color: var(--navy);
+      background: #FFF;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.12);
+    }
+
+    .form-control[readonly] {
+      background: #F1F5F9;
+      color: var(--slate);
+      font-weight: 600;
+    }
+
+    /* Status Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge-collected { background: #E0F2FE; color: #0369A1; }
+    .badge-testing { background: var(--warning-bg); color: var(--warning-text); }
+    .badge-ready { background: var(--purple-bg); color: var(--purple-text); }
+    .badge-approved, .badge-normal, .badge-active { background: var(--success-bg); color: var(--success-text); }
+    .badge-high, .badge-critical, .badge-inactive { background: var(--danger-bg); color: var(--danger-text); }
+    .badge-low { background: var(--warning-bg); color: var(--warning-text); }
+
+    /* =========================================
+       1. LOGIN SCREEN (SPLIT SCREEN DESIGN)
+       ========================================= */
+    .login-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: linear-gradient(135deg, #EBF4FF 0%, #F8FAFC 100%);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 1060px;
+      min-height: 620px;
+      background: #FFF;
+      border-radius: 22px;
+      box-shadow: var(--shadow-lg);
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      overflow: hidden;
+      border: 1px solid #E2E8F0;
+    }
+
+    .login-left {
+      background: linear-gradient(160deg, #F0F7FF 0%, #DBEAFE 100%);
+      padding: 40px 36px 0 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-left h1 {
+      font-size: 28px;
+      line-height: 1.22;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 12px;
+    }
+
+    .login-left h1 span {
+      color: var(--primary);
+      display: block;
+    }
+
+    .login-accent-bar {
+      width: 44px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 99px;
+      margin-bottom: 14px;
+    }
+
+    .login-left p {
+      font-size: 13.5px;
+      color: var(--slate);
+      line-height: 1.55;
+      max-width: 340px;
+      margin-bottom: 22px;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      z-index: 2;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    .feature-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #FFF;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+    }
+
+    .login-illustration {
+      margin-top: 16px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+    }
+
+    .login-right {
+      padding: 28px 42px;
+      background: #FAFCFF;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .role-pills {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .role-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #FFF;
+      color: var(--slate);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .role-pill:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .role-pill.active {
+      background: var(--primary-light);
+      border-color: #BAE6FD;
+      color: #0369A1;
+      font-weight: 700;
+    }
+
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    .brand-logo-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #0EA5E9, #0066CC);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF;
+      box-shadow: 0 6px 14px rgba(0, 102, 204, 0.25);
+    }
+
+    .brand-divider {
+      width: 2px;
+      height: 40px;
+      background: #CBD5E1;
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.1;
+    }
+
+    .brand-sub {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0284C7;
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .active-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-light);
+      color: #0369A1;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      width: fit-content;
+    }
+
+    .login-form-box {
+      background: #FFF;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .input-icon-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon-wrap svg.left-ico {
+      position: absolute;
+      left: 12px;
+      color: #94A3B8;
+      pointer-events: none;
+    }
+
+    .input-icon-wrap input {
+      padding-left: 38px;
+      padding-right: 38px;
+      height: 42px;
+    }
+
+    .toggle-pass-btn {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #94A3B8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .login-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      margin-bottom: 18px;
+    }
+
+    .login-options label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+    }
+
+    .login-options a {
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .btn-signin {
+      width: 100%;
+      height: 46px;
+      background: linear-gradient(90deg, #0284C7 0%, #0066CC 100%);
+      color: #FFF;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 16px rgba(0, 102, 204, 0.28);
+      transition: transform 0.1s, box-shadow 0.15s;
+    }
+
+    .btn-signin:hover {
+      box-shadow: 0 8px 20px rgba(0, 102, 204, 0.36);
+    }
+
+    /* =========================================
+       2. MAIN APP SHELL (SIDEBAR + WORKSPACE)
+       ========================================= */
+    .app-shell {
+      flex: 1;
+      display: flex;
+      min-height: calc(100vh - 43px);
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #FFF;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .sidebar-top {
+      padding: 20px 16px;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 8px 20px 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .sidebar-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0EA5E9, #0066CC);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF;
+      flex-shrink: 0;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-section-label {
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #94A3B8;
+      padding: 12px 12px 4px 12px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--slate);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      text-align: left;
+      width: 100%;
+      transition: all 0.15s;
+    }
+
+    .nav-item:hover {
+      background: #F1F5F9;
+      color: var(--navy);
+    }
+
+    .nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .topbar {
+      height: 64px;
+      background: #FFF;
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      padding: 5px 12px 5px 6px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .workspace {
+      padding: 24px 28px;
+      max-width: 1360px;
+      width: 100%;
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.35fr 0.85fr;
+      gap: 20px;
+    }
+
+    .grid-equal-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: #FFF;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .card-title {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .stat-card {
+      background: #FFF;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-top: 2px;
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 11px 12px;
+      background: #F8FAFC;
+      color: var(--slate);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #F1F5F9;
+      color: var(--navy);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: #FAFCFF;
+    }
+
+    /* Filter Tabs */
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      padding: 7px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: #FFF;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--slate);
+      cursor: pointer;
+    }
+
+    .filter-tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #FFF;
+    }
+
+    /* Test Checkboxes */
+    .test-check-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .test-check-item:hover {
+      border-color: var(--primary);
+      background: #F8FAFC;
+    }
+
+    .test-check-item.selected {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    /* Live Sample Progress Stepper */
+    .stepper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      margin: 24px 12px;
+    }
+
+    .stepper::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 30px;
+      right: 30px;
+      height: 3px;
+      background: #E2E8F0;
+      z-index: 1;
+    }
+
+    .step {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 120px;
+      text-align: center;
+    }
+
+    .step-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #FFF;
+      border: 3px solid #CBD5E1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      color: #94A3B8;
+    }
+
+    .step.done .step-circle {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #FFF;
+    }
+
+    .step.current .step-circle {
+      background: #FFF;
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: 0 0 0 5px rgba(0, 102, 204, 0.18);
+    }
+
+    .step-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--slate);
+    }
+
+    .step.done .step-label, .step.current .step-label {
+      color: var(--navy);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0F172A;
+      color: #FFF;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.25s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Modal / Printable Report Preview */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .modal-container {
+      background: #FFF;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 780px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-toolbar {
+      padding: 14px 22px;
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .report-sheet {
+      padding: 36px 42px;
+      background: #FFF;
+    }
+
+    .report-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 18px;
+      margin-bottom: 20px;
+    }
+
+    .report-patient-box {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      font-size: 13px;
+      margin-bottom: 22px;
+    }
+
+    .signature-stamp {
+      border: 2px solid #0284C7;
+      color: #0284C7;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transform: rotate(-4deg);
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #reportModal, #reportModal * { visibility: visible; }
+      #reportModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        background: #FFF;
+        padding: 0;
+      }
+      .modal-toolbar { display: none !important; }
+      .modal-container { box-shadow: none; max-height: none; }
+    }
+
+    @media (max-width: 960px) {
+      .login-card { grid-template-columns: 1fr; }
+      .login-left { display: none; }
+      .grid-2, .grid-equal-2, .grid-4 { grid-template-columns: 1fr; }
+      .app-shell { flex-direction: column; }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Prototype Quick-Switcher Bar -->
+  <div class="preview-bar">
+    <div class="preview-bar-title">
+      <span class="preview-bar-badge">Interactive Prototype</span>
+      <span>MediTrack Diagnostic Center — Full System Workflow</span>
+    </div>
+    <div class="preview-bar-actions">
+      <span style="color:#94A3B8; font-size:12px; margin-right:4px;">Jump to Screen:</span>
+      <button class="preview-btn active" id="qBtn-login" onclick="switchView('login')">1. Login</button>
+      <button class="preview-btn" id="qBtn-reception" onclick="loginAsRole('Receptionist')">2. Receptionist</button>
+      <button class="preview-btn" id="qBtn-lab" onclick="loginAsRole('Lab Technologist')">3. Lab Tech</button>
+      <button class="preview-btn" id="qBtn-admin" onclick="loginAsRole('Admin / Doctor')">4. Admin / Doctor</button>
+      <button class="preview-btn" id="qBtn-patient" onclick="loginAsRole('Patient')">5. Patient Portal</button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       VIEW 1: SPLIT-SCREEN LOGIN PORTAL
+       ========================================================= -->
+  <div id="loginView" class="login-wrapper">
+    <div class="login-card">
+      <!-- Left Branding Banner -->
+      <div class="login-left">
+        <div>
+          <h1>Comprehensive<br>Patient Management<span>Made Simple.</span></h1>
+          <div class="login-accent-bar"></div>
+          <p>Track pathology samples from collection to lab analyzer processing, doctor verification, and report delivery in one place.</p>
+          <ul class="feature-list">
+            <li>
+              <span class="feature-icon">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg>
+              </span>
+              Unique Sample Barcode Tracking
+            </li>
+            <li>
+              <span class="feature-icon">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              Patient &amp; Test Order Records
+            </li>
+            <li>
+              <span class="feature-icon">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+              </span>
+              Automated Reference Range Flagging
+            </li>
+            <li>
+              <span class="feature-icon">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              Role-Based Access &amp; Sign-Off
+            </li>
+          </ul>
+        </div>
+
+        <!-- Clean Vector Medical Building + Cross Graphic -->
+        <div class="login-illustration">
+          <svg width="360" height="165" viewBox="0 0 360 165" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="265" cy="120" r="105" fill="#3B82F6" fill-opacity="0.16"/>
+            <rect x="24" y="55" width="175" height="110" rx="8" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="2"/>
+            <rect x="145" y="75" width="115" height="90" rx="6" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="2"/>
+            <!-- Medical Cross on Building -->
+            <rect x="52" y="68" width="24" height="24" rx="6" fill="#0066CC"/>
+            <path d="M64 73V87M57 80H71" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <text x="82" y="84" fill="#0F172A" font-size="11" font-weight="800">Diagnostic Center</text>
+            <!-- Windows -->
+            <rect x="40" y="102" width="26" height="18" rx="3" fill="#BAE6FD"/>
+            <rect x="74" y="102" width="26" height="18" rx="3" fill="#BAE6FD"/>
+            <rect x="108" y="102" width="26" height="18" rx="3" fill="#BAE6FD"/>
+            <rect x="40" y="128" width="26" height="18" rx="3" fill="#BAE6FD"/>
+            <rect x="74" y="128" width="26" height="18" rx="3" fill="#BAE6FD"/>
+            <rect x="108" y="128" width="26" height="37" rx="3" fill="#0284C7"/>
+            <!-- Microscope / Lab Badge -->
+            <circle cx="290" cy="95" r="42" fill="#0066CC"/>
+            <path d="M290 77V113M272 95H308" stroke="white" stroke-width="7" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Right Login Form -->
+      <div class="login-right">
+        <!-- Role Switcher Pills -->
+        <div class="role-pills">
+          <button class="role-pill active" data-role="Patient" onclick="selectLoginRole('Patient')">Patient</button>
+          <button class="role-pill" data-role="Receptionist" onclick="selectLoginRole('Receptionist')">Reception</button>
+          <button class="role-pill" data-role="Lab Technologist" onclick="selectLoginRole('Lab Technologist')">Lab Tech</button>
+          <button class="role-pill" data-role="Admin / Doctor" onclick="selectLoginRole('Admin / Doctor')">Admin / Doctor</button>
+        </div>
+
+        <div class="brand-header">
+          <div class="brand-logo-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </div>
+          <div class="brand-divider"></div>
+          <div>
+            <div class="brand-title">MediTrack</div>
+            <div class="brand-sub">Diagnostic Center</div>
+          </div>
+        </div>
+        <div class="login-subtitle">Sign in to access the Diagnostic Lab &amp; Sample Tracking System</div>
+
+        <div class="active-role-badge" id="loginRoleBadge">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Patient Login</span>
+        </div>
+
+        <div class="login-form-box">
+          <div class="form-group">
+            <label class="form-label" id="loginIdLabel">Patient ID / Username</label>
+            <div class="input-icon-wrap">
+              <svg class="left-ico" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input type="text" id="loginIdInput" class="form-control" value="PAT-2026-001" placeholder="Enter your Patient ID or username" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-icon-wrap">
+              <svg class="left-ico" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="loginPassInput" class="form-control" value="1234" placeholder="Enter your password" />
+              <button type="button" class="toggle-pass-btn" onclick="toggleLoginPass()" title="Show/Hide Password">
+                <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="login-options">
+            <label><input type="checkbox" checked /> Remember Me</label>
+            <a href="#" onclick="showToast('Contact Diagnostic Center IT Admin to reset password.'); return false;">Forgot Password?</a>
+          </div>
+
+          <button type="button" class="btn-signin" onclick="handleSignIn()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+            Sign In
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       VIEW 2: AUTHENTICATED ROLE WORKSPACE SHELL
+       ========================================================= -->
+  <div id="appShell" class="app-shell hidden">
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-brand">
+          <div class="sidebar-logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </div>
+          <div>
+            <div style="font-weight:800; font-size:16px; color:var(--navy); line-height:1.1;">MediTrack</div>
+            <div style="font-size:11px; font-weight:700; color:#0284C7;">Diagnostic Center</div>
+          </div>
+        </div>
+
+        <nav id="sidebarNav" class="sidebar-nav"></nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="nav-item" style="color:#DC2626;" onclick="switchView('login')">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Right Content Area -->
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="user-chip">
+          <div class="user-avatar" id="topbarAvatar">R</div>
+          <span id="topbarRoleName">Receptionist</span>
+        </div>
+      </header>
+
+      <main id="workspaceContent" class="workspace"></main>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       PRINTABLE DIAGNOSTIC REPORT PREVIEW MODAL
+       ========================================================= -->
+  <div id="reportModal" class="modal-backdrop hidden">
+    <div class="modal-container">
+      <div class="modal-toolbar">
+        <span style="font-weight:700; font-size:14px;">Printable Diagnostic Report Preview</span>
+        <div class="flex gap-2">
+          <button class="btn btn-primary btn-sm" onclick="window.print()">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print / Save PDF
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="closeReportModal()">Close</button>
+        </div>
+      </div>
+      <div id="reportSheetContent" class="report-sheet"></div>
+    </div>
+  </div>
+
+  <!-- Toast Feedback -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // =========================================================
+    // IN-MEMORY DATABASE STATE (Mirrors C# SQL Server Schema)
+    // =========================================================
+    const state = {
+      currentRole: 'Patient',
+      activeTab: '',
+      selectedSampleForEntry: null,
+      patientPortalId: 'PAT-2026-001',
+      queueFilter: 'All',
+
+      patients: [
+        { id: 'PAT-2026-001', name: 'Md. Muijul Hoque Azad', age: 28, gender: 'Male', phone: '01712-345678', password: '1234' },
+        { id: 'PAT-2026-002', name: 'Fahmida Yeasmin', age: 34, gender: 'Female', phone: '01819-223344', password: '1234' },
+        { id: 'PAT-2026-003', name: 'Rafiqul Islam', age: 49, gender: 'Male', phone: '01911-998877', password: '1234' }
+      ],
+
+      testCatalog: [
+        { code: 'HEM-HB', name: 'Complete Blood Count (Hemoglobin)', categoryType: 'BloodTest', subCategory: 'Hematology', min: 13.0, max: 17.0, unit: 'g/dL' },
+        { code: 'HEM-WBC', name: 'Total WBC Count', categoryType: 'BloodTest', subCategory: 'Hematology', min: 4.0, max: 11.0, unit: 'x10³/µL' },
+        { code: 'BIO-CHOL', name: 'Lipid Profile (Total Cholesterol)', categoryType: 'BloodTest', subCategory: 'Biochemistry', min: 120.0, max: 200.0, unit: 'mg/dL' },
+        { code: 'IMG-XRAY', name: 'Chest X-Ray (PA View)', categoryType: 'ImagingTest', subCategory: 'Radiology / Imaging', min: null, max: null, unit: 'N/A' },
+        { code: 'IMG-USG', name: 'Whole Abdomen Ultrasound', categoryType: 'ImagingTest', subCategory: 'Radiology / Imaging', min: null, max: null, unit: 'N/A' }
+      ],
+
+      sampleOrders: [
+        {
+          barcodeId: 'SMP-20261127-0001',
+          orderCode: 'ORD-20261127-01',
+          patientId: 'PAT-2026-001',
+          testCode: 'HEM-HB',
+          status: 'Doctor Approved',
+          numericResult: 11.4,
+          imagingNotes: '',
+          flag: 'Low (L)',
+          createdAt: '27 Nov 2026, 09:30 AM',
+          approvedBy: 'Dr. Chief Pathologist'
+        },
+        {
+          barcodeId: 'SMP-20261127-0002',
+          orderCode: 'ORD-20261127-01',
+          patientId: 'PAT-2026-001',
+          testCode: 'HEM-WBC',
+          status: 'Testing',
+          numericResult: null,
+          imagingNotes: '',
+          flag: 'Pending',
+          createdAt: '27 Nov 2026, 09:30 AM',
+          approvedBy: null
+        },
+        {
+          barcodeId: 'SMP-20261127-0003',
+          orderCode: 'ORD-20261127-02',
+          patientId: 'PAT-2026-002',
+          testCode: 'BIO-CHOL',
+          status: 'Ready',
+          numericResult: 238.0,
+          imagingNotes: '',
+          flag: 'High (H)',
+          createdAt: '27 Nov 2026, 10:05 AM',
+          approvedBy: null
+        },
+        {
+          barcodeId: 'SMP-20261127-0004',
+          orderCode: 'ORD-20261127-03',
+          patientId: 'PAT-2026-003',
+          testCode: 'IMG-XRAY',
+          status: 'Collected',
+          numericResult: null,
+          imagingNotes: '',
+          imagingFileName: '',
+          imagingDataUrl: '',
+          flag: 'Pending',
+          createdAt: '27 Nov 2026, 10:40 AM',
+          approvedBy: null
+        }
+      ],
+
+      staffUsers: [
+        { id: 'ADM-01', name: 'Dr. Chief Pathologist', role: 'Admin / Doctor', active: true },
+        { id: 'REC-01', name: 'Ayesha Siddika', role: 'Receptionist', active: true },
+        { id: 'LAB-01', name: 'Tanvir Ahmed', role: 'Lab Technologist', active: true }
+      ]
+    };
+
+    // =========================================================
+    // NAVIGATION & LOGIN HANDLERS
+    // =========================================================
+    const roleDefaultInputs = {
+      'Patient': { label: 'Patient ID / Username', id: 'PAT-2026-001', placeholder: 'Enter your Patient ID or username' },
+      'Receptionist': { label: 'Receptionist Staff ID', id: 'REC-01', placeholder: 'Enter Receptionist ID' },
+      'Lab Technologist': { label: 'Lab Technologist ID', id: 'LAB-01', placeholder: 'Enter Lab Tech ID' },
+      'Admin / Doctor': { label: 'Admin / Doctor ID', id: 'ADM-01', placeholder: 'Enter Admin or Doctor ID' }
+    };
+
+    function selectLoginRole(role) {
+      state.currentRole = role;
+      document.querySelectorAll('.role-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.role === role);
+      });
+      const cfg = roleDefaultInputs[role];
+      document.getElementById('loginRoleBadge').querySelector('span').textContent = `${role} Login`;
+      document.getElementById('loginIdLabel').textContent = cfg.label;
+      document.getElementById('loginIdInput').value = cfg.id;
+      document.getElementById('loginIdInput').placeholder = cfg.placeholder;
+    }
+
+    function toggleLoginPass() {
+      const inp = document.getElementById('loginPassInput');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    function handleSignIn() {
+      const id = document.getElementById('loginIdInput').value.trim();
+      if (!id) {
+        showToast('Please enter your ID or Username.');
+        return;
+      }
+      if (state.currentRole === 'Patient') {
+        const found = state.patients.find(p => p.id.toLowerCase() === id.toLowerCase());
+        if (found) state.patientPortalId = found.id;
+      }
+      loginAsRole(state.currentRole);
+    }
+
+    function switchView(view) {
+      document.querySelectorAll('.preview-btn').forEach(b => b.classList.remove('active'));
+      if (view === 'login') {
+        document.getElementById('qBtn-login').classList.add('active');
+        document.getElementById('loginView').classList.remove('hidden');
+        document.getElementById('appShell').classList.add('hidden');
+      } else {
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('appShell').classList.remove('hidden');
+      }
+    }
+
+    function loginAsRole(role) {
+      state.currentRole = role;
+      switchView('app');
+      const mapBtn = {
+        'Receptionist': 'qBtn-reception',
+        'Lab Technologist': 'qBtn-lab',
+        'Admin / Doctor': 'qBtn-admin',
+        'Patient': 'qBtn-patient'
+      };
+      if (mapBtn[role]) document.getElementById(mapBtn[role]).classList.add('active');
+
+      document.getElementById('topbarRoleName').textContent = role;
+      document.getElementById('topbarAvatar').textContent = role.charAt(0);
+
+      renderSidebarForRole(role);
+    }
+
+    function renderSidebarForRole(role) {
+      const nav = document.getElementById('sidebarNav');
+      let items = [];
+
+      if (role === 'Receptionist') {
+        items = [
+          { section: 'Front-Desk Operations' },
+          { id: 'rec-patients', label: 'Patient Management', icon: 'users' },
+          { id: 'rec-booking', label: 'Test Booking & Barcodes', icon: 'barcode' },
+          { id: 'rec-dispatch', label: 'Report Dispatch', icon: 'file' }
+        ];
+      } else if (role === 'Lab Technologist') {
+        items = [
+          { section: 'Pathology & Lab Bench' },
+          { id: 'lab-queue', label: 'Sample Tracking Queue', icon: 'flask' },
+          { id: 'lab-entry', label: 'Result Entry & Validation', icon: 'check' },
+          { id: 'lab-completed', label: 'Completed Samples Log', icon: 'file' }
+        ];
+      } else if (role === 'Admin / Doctor') {
+        items = [
+          { section: 'Doctor & Admin Controls' },
+          { id: 'adm-overview', label: 'Overview & KPIs', icon: 'grid' },
+          { id: 'adm-approval', label: 'Report Verification & Sign-Off', icon: 'shield' },
+          { id: 'adm-catalog', label: 'Test Catalog & Ranges', icon: 'list' },
+          { id: 'adm-staff', label: 'Staff Account Management', icon: 'users' },
+          { section: 'Inherited Staff Access' },
+          { id: 'rec-patients', label: 'Reception: Patients', icon: 'users' },
+          { id: 'rec-booking', label: 'Reception: Book & Barcode', icon: 'barcode' },
+          { id: 'lab-queue', label: 'Lab: Sample Queue', icon: 'flask' },
+          { id: 'lab-entry', label: 'Lab: Result Entry', icon: 'check' }
+        ];
+      } else if (role === 'Patient') {
+        items = [
+          { section: 'Patient Portal' },
+          { id: 'pat-tracking', label: 'Live Sample Tracking', icon: 'activity' },
+          { id: 'pat-reports', label: 'My Diagnostic Reports', icon: 'file' }
+        ];
+      }
+
+      nav.innerHTML = items.map(item => {
+        if (item.section) {
+          return `<div class="nav-section-label">${item.section}</div>`;
+        }
+        return `<button class="nav-item" id="nav-${item.id}" onclick="openTab('${item.id}', '${item.label}')">
+          ${getIconSvg(item.icon)}
+          <span>${item.label}</span>
+        </button>`;
+      }).join('');
+
+      const firstTab = items.find(i => i.id);
+      if (firstTab) openTab(firstTab.id, firstTab.label);
+    }
+
+    function openTab(tabId, title) {
+      state.activeTab = tabId;
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const activeBtn = document.getElementById(`nav-${tabId}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      document.getElementById('topbarTitle').textContent = title;
+
+      const container = document.getElementById('workspaceContent');
+      switch (tabId) {
+        case 'rec-patients': renderReceptionPatients(container); break;
+        case 'rec-booking': renderReceptionBooking(container); break;
+        case 'rec-dispatch': renderReceptionDispatch(container); break;
+        case 'lab-queue': renderLabQueue(container); break;
+        case 'lab-entry': renderLabResultEntry(container); break;
+        case 'lab-completed': renderLabCompletedLog(container); break;
+        case 'adm-overview': renderAdminOverview(container); break;
+        case 'adm-approval': renderAdminApproval(container); break;
+        case 'adm-catalog': renderAdminCatalog(container); break;
+        case 'adm-staff': renderAdminStaff(container); break;
+        case 'pat-tracking': renderPatientTracking(container); break;
+        case 'pat-reports': renderPatientReports(container); break;
+      }
+    }
+
+    // =========================================================
+    // RECEPTIONIST VIEWS
+    // =========================================================
+    function renderReceptionPatients(container) {
+      const nextNum = String(state.patients.length + 1).padStart(3, '0');
+      const autoPatId = `PAT-2026-${nextNum}`;
+      const autoPass = 'MT' + Math.floor(1000 + Math.random() * 9000);
+
+      container.innerHTML = `
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Register New Patient</span>
+              <span class="badge badge-collected">Auto-ID &amp; Credentials</span>
+            </div>
+            <form onsubmit="registerPatient(event)">
+              <div class="grid-equal-2">
+                <div class="form-group">
+                  <label class="form-label">Auto-Generated Patient ID</label>
+                  <input type="text" id="newPatId" class="form-control" value="${autoPatId}" readonly />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Auto-Generated Login Password</label>
+                  <input type="text" id="newPatPass" class="form-control" value="${autoPass}" readonly />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Patient Full Name *</label>
+                <input type="text" id="newPatName" class="form-control" placeholder="e.g., Nusrat Jahan" required />
+              </div>
+              <div class="grid-equal-2">
+                <div class="form-group">
+                  <label class="form-label">Age (Years) *</label>
+                  <input type="number" id="newPatAge" class="form-control" min="0" max="120" placeholder="e.g., 29" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Gender *</label>
+                  <select id="newPatGender" class="form-control">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number *</label>
+                <input type="text" id="newPatPhone" class="form-control" placeholder="e.g., 01711-000000" required />
+              </div>
+              <button type="submit" class="btn btn-primary w-full">Register Patient &amp; Generate Credentials</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Search &amp; Manage Patients</span>
+            </div>
+            <div class="form-group">
+              <input type="text" id="patSearchInput" class="form-control" placeholder="Search by Patient ID, Name, or Phone..." oninput="filterPatientTable()" />
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Age / Sex</th>
+                    <th>Phone</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="patientListBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+      filterPatientTable();
+    }
+
+    function registerPatient(e) {
+      e.preventDefault();
+      const id = document.getElementById('newPatId').value;
+      const password = document.getElementById('newPatPass').value;
+      const name = document.getElementById('newPatName').value.trim();
+      const age = parseInt(document.getElementById('newPatAge').value, 10);
+      const gender = document.getElementById('newPatGender').value;
+      const phone = document.getElementById('newPatPhone').value.trim();
+
+      state.patients.unshift({ id, name, age, gender, phone, password });
+      showToast(`Registered ${name} (${id}) | Temp Password: ${password}`);
+      renderReceptionPatients(document.getElementById('workspaceContent'));
+    }
+
+    function filterPatientTable() {
+      const q = (document.getElementById('patSearchInput')?.value || '').toLowerCase();
+      const tbody = document.getElementById('patientListBody');
+      if (!tbody) return;
+      const filtered = state.patients.filter(p =>
+        p.id.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) || p.phone.toLowerCase().includes(q)
+      );
+      tbody.innerHTML = filtered.map(p => `
+        <tr>
+          <td><strong>${p.id}</strong></td>
+          <td>${p.name}</td>
+          <td>${p.age}y / ${p.gender}</td>
+          <td>${p.phone}</td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="quickBookForPatient('${p.id}')">Book Tests</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function quickBookForPatient(patId) {
+      openTab('rec-booking', 'Test Booking & Barcodes');
+      setTimeout(() => {
+        const sel = document.getElementById('bookingPatientSelect');
+        if (sel) sel.value = patId;
+      }, 20);
+    }
+
+    function renderReceptionBooking(container) {
+      const orderNum = String(state.sampleOrders.length + 1).padStart(2, '0');
+      const orderCode = `ORD-20261127-${orderNum}`;
+
+      container.innerHTML = `
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Select Patient &amp; Diagnostic Tests</span>
+              <span class="badge badge-collected">Order Code: ${orderCode}</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Select Registered Patient</label>
+              <select id="bookingPatientSelect" class="form-control">
+                ${state.patients.map(p => `<option value="${p.id}">${p.id} — ${p.name} (${p.age}y, ${p.gender})</option>`).join('')}
+              </select>
+            </div>
+
+            <label class="form-label mb-3" style="display:block;">Select Multiple Tests (BloodTest &amp; ImagingTest Categories)</label>
+            <div id="testSelectionList">
+              ${state.testCatalog.map(t => `
+                <label class="test-check-item" id="chk-wrap-${t.code}">
+                  <div class="flex items-center gap-3">
+                    <input type="checkbox" value="${t.code}" onchange="updateBarcodePreview('${orderCode}')" />
+                    <div>
+                      <div style="font-weight:700; font-size:13.5px;">${t.name}</div>
+                      <div style="font-size:11.5px; color:var(--muted);">Code: ${t.code} • ${t.subCategory}</div>
+                    </div>
+                  </div>
+                  <span class="badge ${t.categoryType === 'BloodTest' ? 'badge-collected' : 'badge-testing'}">${t.categoryType}</span>
+                </label>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Sample Barcode ID Generator</span>
+            </div>
+            <p style="font-size:12.5px; color:var(--muted); margin-bottom:14px;">
+              Each selected test generates a unique container/vial barcode (<code>SMP-YYYYMMDD-XXXX</code>) to prevent sample mix-ups.
+            </p>
+            <div id="barcodePreviewArea" style="min-height:180px; background:#F8FAFC; border:1px dashed #CBD5E1; border-radius:12px; padding:16px;">
+              <div style="text-align:center; color:var(--muted); font-size:13px; padding-top:55px;">
+                Check one or more tests on the left to preview unique sample barcodes.
+              </div>
+            </div>
+            <button class="btn btn-primary w-full mt-4" onclick="confirmGenerateOrders('${orderCode}')">
+              Confirm Order &amp; Send Samples to Lab Queue
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateBarcodePreview(orderCode) {
+      const checked = Array.from(document.querySelectorAll('#testSelectionList input[type="checkbox"]:checked'));
+      document.querySelectorAll('.test-check-item').forEach(el => el.classList.remove('selected'));
+      checked.forEach(cb => document.getElementById(`chk-wrap-${cb.value}`)?.classList.add('selected'));
+
+      const area = document.getElementById('barcodePreviewArea');
+      if (checked.length === 0) {
+        area.innerHTML = `<div style="text-align:center; color:var(--muted); font-size:13px; padding-top:55px;">Check one or more tests on the left to preview unique sample barcodes.</div>`;
+        return;
+      }
+
+      let baseSeq = state.sampleOrders.length + 1;
+      area.innerHTML = checked.map((cb, idx) => {
+        const test = state.testCatalog.find(t => t.code === cb.value);
+        const smpId = `SMP-20261127-${String(baseSeq + idx).padStart(4, '0')}`;
+        return `
+          <div style="background:#FFF; border:1px solid var(--border); border-radius:10px; padding:10px 14px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-weight:700; font-size:13px;">${test.name}</div>
+              <div style="font-size:11.5px; color:var(--primary); font-weight:700;">${smpId}</div>
+            </div>
+            ${renderBarcodeSvg(smpId, 110, 32)}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function confirmGenerateOrders(orderCode) {
+      const patId = document.getElementById('bookingPatientSelect').value;
+      const checked = Array.from(document.querySelectorAll('#testSelectionList input[type="checkbox"]:checked'));
+      if (checked.length === 0) {
+        showToast('Please select at least one test to register.');
+        return;
+      }
+
+      let baseSeq = state.sampleOrders.length + 1;
+      checked.forEach((cb, idx) => {
+        const smpId = `SMP-20261127-${String(baseSeq + idx).padStart(4, '0')}`;
+        state.sampleOrders.unshift({
+          barcodeId: smpId,
+          orderCode: orderCode,
+          patientId: patId,
+          testCode: cb.value,
+          status: 'Collected',
+          numericResult: null,
+          imagingNotes: '',
+          imagingFileName: '',
+          imagingDataUrl: '',
+          flag: 'Pending',
+          createdAt: '27 Nov 2026, Just Now',
+          approvedBy: null
+        });
+      });
+
+      showToast(`Generated ${checked.length} sample barcode(s) under ${orderCode} and dispatched to Lab!`);
+      renderReceptionBooking(document.getElementById('workspaceContent'));
+    }
+
+    function renderReceptionDispatch(container) {
+      const approved = state.sampleOrders.filter(o => o.status === 'Doctor Approved');
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Doctor-Approved Reports Ready for Dispatch</span>
+            <span class="badge badge-approved">${approved.length} Ready to Print</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sample Barcode</th>
+                  <th>Patient</th>
+                  <th>Test Name</th>
+                  <th>Result / Flag</th>
+                  <th>Approved By</th>
+                  <th>Dispatch Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${approved.length === 0 ? `<tr><td colspan="6" style="text-align:center; color:var(--muted);">No Doctor-Approved reports available yet.</td></tr>` :
+                  approved.map(o => {
+                    const pat = state.patients.find(p => p.id === o.patientId);
+                    const test = state.testCatalog.find(t => t.code === o.testCode);
+                    return `
+                      <tr>
+                        <td><strong>${o.barcodeId}</strong></td>
+                        <td>${pat?.name} (${o.patientId})</td>
+                        <td>${test?.name}</td>
+                        <td>${getFlagBadge(o.flag)}</td>
+                        <td>${o.approvedBy || 'Dr. Chief Pathologist'}</td>
+                        <td>
+                          <button class="btn btn-primary btn-sm" onclick="openReportModal('${o.barcodeId}')">Print / View Report</button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================
+    // LAB TECHNOLOGIST VIEWS
+    // =========================================================
+    function renderLabQueue(container) {
+      const counts = {
+        All: state.sampleOrders.length,
+        Collected: state.sampleOrders.filter(o => o.status === 'Collected').length,
+        Testing: state.sampleOrders.filter(o => o.status === 'Testing').length,
+        Ready: state.sampleOrders.filter(o => o.status === 'Ready').length
+      };
+
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-header" style="flex-wrap:wrap; gap:12px;">
+            <div class="filter-tabs">
+              ${['All', 'Collected', 'Testing', 'Ready'].map(st => `
+                <button class="filter-tab ${state.queueFilter === st ? 'active' : ''}" onclick="setQueueFilter('${st}')">
+                  ${st} (${counts[st]})
+                </button>
+              `).join('')}
+            </div>
+            <div style="width:280px;">
+              <input type="text" id="labBarcodeSearch" class="form-control" placeholder="Scan or search Barcode ID..." oninput="renderLabQueueRows()" />
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Barcode ID</th>
+                  <th>Patient</th>
+                  <th>Test &amp; Category</th>
+                  <th>Workflow Status</th>
+                  <th>Flag</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="labQueueTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      renderLabQueueRows();
+    }
+
+    function setQueueFilter(status) {
+      state.queueFilter = status;
+      renderLabQueue(document.getElementById('workspaceContent'));
+    }
+
+    function renderLabQueueRows() {
+      const q = (document.getElementById('labBarcodeSearch')?.value || '').toLowerCase();
+      const tbody = document.getElementById('labQueueTbody');
+      if (!tbody) return;
+
+      const list = state.sampleOrders.filter(o => {
+        const matchesTab = state.queueFilter === 'All' || o.status === state.queueFilter;
+        const matchesQuery = o.barcodeId.toLowerCase().includes(q) || o.patientId.toLowerCase().includes(q);
+        return matchesTab && matchesQuery;
+      });
+
+      tbody.innerHTML = list.map(o => {
+        const pat = state.patients.find(p => p.id === o.patientId);
+        const test = state.testCatalog.find(t => t.code === o.testCode);
+        return `
+          <tr>
+            <td><strong>${o.barcodeId}</strong></td>
+            <td>${pat?.name}<br><span style="font-size:11px; color:var(--muted);">${o.patientId}</span></td>
+            <td>${test?.name}<br><span style="font-size:11px; color:#0284C7; font-weight:700;">${test?.categoryType}</span></td>
+            <td>${getStatusBadge(o.status)}</td>
+            <td>${getFlagBadge(o.flag)}</td>
+            <td>
+              <div class="flex gap-2">
+                ${o.status === 'Collected' ? `<button class="btn btn-outline btn-sm" onclick="advanceToTesting('${o.barcodeId}')">Start Testing</button>` : ''}
+                ${o.status !== 'Doctor Approved' ? `<button class="btn btn-primary btn-sm" onclick="goToResultEntry('${o.barcodeId}')">Enter Results</button>` : `<span style="font-size:12px; color:var(--muted);">Locked (Approved)</span>`}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function advanceToTesting(barcodeId) {
+      const order = state.sampleOrders.find(o => o.barcodeId === barcodeId);
+      if (order) {
+        order.status = 'Testing';
+        showToast(`Sample ${barcodeId} moved to Testing on analyzer.`);
+        renderLabQueue(document.getElementById('workspaceContent'));
+      }
+    }
+
+    function goToResultEntry(barcodeId) {
+      state.selectedSampleForEntry = barcodeId;
+      openTab('lab-entry', 'Result Entry & Validation');
+    }
+
+    function renderLabResultEntry(container) {
+      const editableOrders = state.sampleOrders.filter(o => o.status !== 'Doctor Approved');
+      if (!state.selectedSampleForEntry && editableOrders.length > 0) {
+        state.selectedSampleForEntry = editableOrders[0].barcodeId;
+      }
+
+      const currentOrder = state.sampleOrders.find(o => o.barcodeId === state.selectedSampleForEntry);
+      if (!currentOrder) {
+        container.innerHTML = `<div class="card"><p>No pending samples available for result entry.</p></div>`;
+        return;
+      }
+
+      const pat = state.patients.find(p => p.id === currentOrder.patientId);
+      const test = state.testCatalog.find(t => t.code === currentOrder.testCode);
+      const isBlood = test.categoryType === 'BloodTest';
+
+      container.innerHTML = `
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Enter Diagnostic Result</span>
+              <span class="badge badge-testing">${test.categoryType}</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Select Sample Barcode</label>
+              <select class="form-control" onchange="goToResultEntry(this.value)">
+                ${editableOrders.map(o => {
+                  const t = state.testCatalog.find(x => x.code === o.testCode);
+                  return `<option value="${o.barcodeId}" ${o.barcodeId === currentOrder.barcodeId ? 'selected' : ''}>${o.barcodeId} — ${t?.name} (${o.status})</option>`;
+                }).join('')}
+              </select>
+            </div>
+
+            <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:16px; font-size:13px;">
+              <strong>Patient:</strong> ${pat?.name} (${pat?.age}y, ${pat?.gender}) &nbsp;|&nbsp; <strong>Test:</strong> ${test.name}
+            </div>
+
+            ${isBlood ? `
+              <div class="form-group">
+                <label class="form-label">Numeric Lab Value (${test.unit}) — Standard Range: ${test.min} to ${test.max} ${test.unit}</label>
+                <input type="number" step="0.01" id="bloodNumericInput" class="form-control"
+                       value="${currentOrder.numericResult ?? ''}"
+                       placeholder="Enter measured value..."
+                       oninput="liveEvaluateThreshold(${test.min}, ${test.max})" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Automated Threshold Flag Preview</label>
+                <div id="liveFlagPreview" style="padding:10px 14px; border-radius:8px; background:#F1F5F9; font-weight:700;">
+                  Enter a numeric value above to auto-evaluate against reference range.
+                </div>
+              </div>
+            ` : `
+              <div class="form-group">
+                <label class="form-label">Radiologist / Clinical Imaging Observations *</label>
+                <textarea id="imagingNotesInput" class="form-control" rows="4" placeholder="Enter X-Ray / Ultrasound clinical observations and scan impression...">${currentOrder.imagingNotes || ''}</textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Upload / Update Scan Image File (X-Ray / Ultrasound PNG, JPG)</label>
+                <div style="border:1.5px dashed #CBD5E1; border-radius:10px; padding:14px; background:#F8FAFC;">
+                  <div class="flex items-center justify-between gap-2" style="flex-wrap:wrap;">
+                    <input type="file" id="imagingFileInput" accept="image/*" style="display:none;" onchange="handleImagingFileSelect(event, '${currentOrder.barcodeId}')" />
+                    <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('imagingFileInput').click()">
+                      ${currentOrder.imagingDataUrl ? 'Replace / Update Scan Image' : 'Choose Scan Image File'}
+                    </button>
+                    <span id="imagingFileNameLabel" style="font-size:12px; font-weight:600; color:var(--slate);">
+                      ${currentOrder.imagingFileName || 'No scan image uploaded yet'}
+                    </span>
+                  </div>
+                  <div id="imagingPreviewWrap" class="${currentOrder.imagingDataUrl ? '' : 'hidden'}" style="margin-top:12px; display:flex; align-items:center; gap:12px; background:#FFF; padding:8px; border-radius:8px; border:1px solid var(--border);">
+                    <img id="imagingPreviewThumb" src="${currentOrder.imagingDataUrl || ''}" alt="Scan Preview" style="width:84px; height:64px; object-fit:cover; border-radius:6px; border:1px solid #CBD5E1;" />
+                    <div style="font-size:12px; color:var(--muted);">
+                      <div style="font-weight:700; color:var(--navy);">Scan Attached</div>
+                      <div>Will be included in Doctor Review &amp; Final Report</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `}
+
+            <button class="btn btn-primary w-full mt-2" onclick="saveLabResult('${currentOrder.barcodeId}')">
+              Save Result &amp; Mark Status 'Ready' for Doctor Review
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Reference Range &amp; OOP Class Info</span>
+            </div>
+            <p style="font-size:13px; color:var(--slate); line-height:1.6;">
+              In your C# backend, this sample instantiates <strong>${test.categoryType}</strong> (inheriting from <code>DiagnosticTest</code>).
+            </p>
+            <div style="margin-top:14px; padding:14px; background:#F0F9FF; border:1px solid #BAE6FD; border-radius:10px; font-size:12.5px;">
+              <div><strong>Test Code:</strong> ${test.code}</div>
+              <div class="mt-2"><strong>Sub-Category:</strong> ${test.subCategory}</div>
+              ${isBlood ? `
+                <div class="mt-2"><strong>Min Threshold:</strong> ${test.min} ${test.unit}</div>
+                <div class="mt-2"><strong>Max Threshold:</strong> ${test.max} ${test.unit}</div>
+              ` : `<div class="mt-2"><strong>Evaluation Mode:</strong> Qualitative Clinical Findings + Scan Image Attachment</div>`}
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (isBlood && currentOrder.numericResult !== null) {
+        liveEvaluateThreshold(test.min, test.max);
+      }
+    }
+
+    function handleImagingFileSelect(event, barcodeId) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const order = state.sampleOrders.find(o => o.barcodeId === barcodeId);
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        order.imagingFileName = file.name;
+        order.imagingDataUrl = e.target.result;
+        document.getElementById('imagingFileNameLabel').textContent = file.name;
+        const wrap = document.getElementById('imagingPreviewWrap');
+        const img = document.getElementById('imagingPreviewThumb');
+        img.src = e.target.result;
+        wrap.classList.remove('hidden');
+        showToast(`Scan image "${file.name}" attached to ${barcodeId}.`);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function renderLabCompletedLog(container) {
+      const completed = state.sampleOrders.filter(o => o.status === 'Ready' || o.status === 'Doctor Approved');
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Completed Lab Processing Log</span>
+            <span class="badge badge-approved">${completed.length} Processed</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Barcode ID</th>
+                  <th>Patient</th>
+                  <th>Test Name</th>
+                  <th>Result / Scan</th>
+                  <th>Flag</th>
+                  <th>Current Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${completed.map(o => {
+                  const pat = state.patients.find(p => p.id === o.patientId);
+                  const test = state.testCatalog.find(t => t.code === o.testCode);
+                  const detail = test.categoryType === 'BloodTest'
+                    ? `${o.numericResult} ${test.unit}`
+                    : `${o.imagingNotes.slice(0, 36)}... ${o.imagingFileName ? `(${o.imagingFileName})` : ''}`;
+                  return `
+                    <tr>
+                      <td><strong>${o.barcodeId}</strong></td>
+                      <td>${pat?.name}</td>
+                      <td>${test?.name}</td>
+                      <td>${detail}</td>
+                      <td>${getFlagBadge(o.flag)}</td>
+                      <td>${getStatusBadge(o.status)}</td>
+                      <td>
+                        ${o.status === 'Ready' ? `<button class="btn btn-outline btn-sm" onclick="goToResultEntry('${o.barcodeId}')">Edit / Update</button>` : `<span style="font-size:12px; color:var(--muted);">Doctor Signed</span>`}
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function liveEvaluateThreshold(min, max) {
+      const val = parseFloat(document.getElementById('bloodNumericInput').value);
+      const box = document.getElementById('liveFlagPreview');
+      if (isNaN(val)) {
+        box.innerHTML = 'Awaiting numeric input...';
+        box.style.background = '#F1F5F9';
+        box.style.color = '#475569';
+        return;
+      }
+      if (val < min) {
+        box.innerHTML = `LOW (L) — Below minimum reference threshold (${min})`;
+        box.style.background = '#FEF3C7';
+        box.style.color = '#B45309';
+      } else if (val > max) {
+        box.innerHTML = `HIGH (H) — Exceeds maximum reference threshold (${max})`;
+        box.style.background = '#FEE2E2';
+        box.style.color = '#B91C1C';
+      } else {
+        box.innerHTML = `NORMAL — Within standard reference range (${min} - ${max})`;
+        box.style.background = '#DCFCE7';
+        box.style.color = '#15803D';
+      }
+    }
+
+    function saveLabResult(barcodeId) {
+      const order = state.sampleOrders.find(o => o.barcodeId === barcodeId);
+      const test = state.testCatalog.find(t => t.code === order.testCode);
+
+      if (test.categoryType === 'BloodTest') {
+        const val = parseFloat(document.getElementById('bloodNumericInput').value);
+        if (isNaN(val)) {
+          showToast('Please enter a valid numeric lab result.');
+          return;
+        }
+        order.numericResult = val;
+        order.flag = val < test.min ? 'Low (L)' : (val > test.max ? 'High (H)' : 'Normal');
+      } else {
+        const notes = document.getElementById('imagingNotesInput').value.trim();
+        if (!notes) {
+          showToast('Please enter clinical findings for this imaging test.');
+          return;
+        }
+        order.imagingNotes = notes;
+        order.flag = 'Reviewed';
+      }
+
+      order.status = 'Ready';
+      showToast(`Result saved for ${barcodeId} (${order.flag}). Status updated to Ready!`);
+      openTab('lab-queue', 'Sample Tracking Queue');
+    }
+
+    // =========================================================
+    // ADMIN / DOCTOR SUPER-DASHBOARD VIEWS
+    // =========================================================
+    function renderAdminOverview(container) {
+      const pendingReview = state.sampleOrders.filter(o => o.status === 'Ready').length;
+      const approvedCount = state.sampleOrders.filter(o => o.status === 'Doctor Approved').length;
+      const activeStaff = state.staffUsers.filter(s => s.active).length;
+
+      container.innerHTML = `
+        <div class="grid-4 mb-4">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#E0F2FE; color:#0284C7;">${getIconSvg('users')}</div>
+            <div>
+              <div class="stat-label">Registered Patients</div>
+              <div class="stat-val">${state.patients.length}</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#FEF3C7; color:#B45309;">${getIconSvg('flask')}</div>
+            <div>
+              <div class="stat-label">Pending Doctor Sign-Off</div>
+              <div class="stat-val">${pendingReview}</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#DCFCE7; color:#15803D;">${getIconSvg('shield')}</div>
+            <div>
+              <div class="stat-label">Doctor Approved Reports</div>
+              <div class="stat-val">${approvedCount}</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#F3E8FF; color:#7E22CE;">${getIconSvg('list')}</div>
+            <div>
+              <div class="stat-label">Active Staff &amp; Tests</div>
+              <div class="stat-val">${activeStaff} / ${state.testCatalog.length}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Live Diagnostic Pipeline Overview</span>
+            <button class="btn btn-primary btn-sm" onclick="openTab('adm-approval', 'Report Verification & Sign-Off')">Review Ready Reports</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Barcode ID</th>
+                  <th>Patient</th>
+                  <th>Test</th>
+                  <th>Status</th>
+                  <th>Result Flag</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.sampleOrders.map(o => {
+                  const pat = state.patients.find(p => p.id === o.patientId);
+                  const test = state.testCatalog.find(t => t.code === o.testCode);
+                  return `
+                    <tr>
+                      <td><strong>${o.barcodeId}</strong></td>
+                      <td>${pat?.name}</td>
+                      <td>${test?.name}</td>
+                      <td>${getStatusBadge(o.status)}</td>
+                      <td>${getFlagBadge(o.flag)}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdminApproval(container) {
+      const readyOrders = state.sampleOrders.filter(o => o.status === 'Ready');
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Ready Lab Results — Doctor Verification &amp; Digital Sign-Off</span>
+            <span class="badge badge-ready">${readyOrders.length} Awaiting Approval</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Barcode ID</th>
+                  <th>Patient</th>
+                  <th>Test</th>
+                  <th>Measured Result / Scan Attachment</th>
+                  <th>Threshold Flag</th>
+                  <th>Doctor Decision</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${readyOrders.length === 0 ? `<tr><td colspan="6" style="text-align:center; color:var(--muted);">All Ready lab results have been reviewed!</td></tr>` :
+                  readyOrders.map(o => {
+                    const pat = state.patients.find(p => p.id === o.patientId);
+                    const test = state.testCatalog.find(t => t.code === o.testCode);
+                    const resText = test.categoryType === 'BloodTest'
+                      ? `<strong>${o.numericResult} ${test.unit}</strong> (Ref: ${test.min}-${test.max})`
+                      : `<div>${o.imagingNotes}</div>${o.imagingDataUrl ? `<div class="mt-2 flex items-center gap-2"><img src="${o.imagingDataUrl}" style="width:48px; height:36px; object-fit:cover; border-radius:4px; border:1px solid #CBD5E1;" /><span style="font-size:11.5px; color:#0284C7; font-weight:600;">${o.imagingFileName}</span></div>` : ''}`;
+                    return `
+                      <tr>
+                        <td><strong>${o.barcodeId}</strong></td>
+                        <td>${pat?.name}</td>
+                        <td>${test?.name}</td>
+                        <td>${resText}</td>
+                        <td>${getFlagBadge(o.flag)}</td>
+                        <td>
+                          <div class="flex gap-2">
+                            <button class="btn btn-success btn-sm" onclick="approveReport('${o.barcodeId}')">Approve &amp; Sign Off</button>
+                            <button class="btn btn-outline btn-sm" onclick="sendBackForRetest('${o.barcodeId}')">Retest</button>
+                          </div>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function approveReport(barcodeId) {
+      const order = state.sampleOrders.find(o => o.barcodeId === barcodeId);
+      if (order) {
+        order.status = 'Doctor Approved';
+        order.approvedBy = 'Dr. Chief Pathologist';
+        showToast(`Report ${barcodeId} approved & unlocked in Patient Portal!`);
+        renderAdminApproval(document.getElementById('workspaceContent'));
+      }
+    }
+
+    function sendBackForRetest(barcodeId) {
+      const order = state.sampleOrders.find(o => o.barcodeId === barcodeId);
+      if (order) {
+        order.status = 'Testing';
+        order.flag = 'Pending';
+        showToast(`Sample ${barcodeId} sent back to Lab Tech for re-testing.`);
+        renderAdminApproval(document.getElementById('workspaceContent'));
+      }
+    }
+
+    function renderAdminCatalog(container) {
+      container.innerHTML = `
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Test Catalog &amp; Standard Reference Ranges</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Test Name</th>
+                    <th>OOP Class</th>
+                    <th>Standard Range</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${state.testCatalog.map((t, idx) => `
+                    <tr>
+                      <td><strong>${t.code}</strong></td>
+                      <td>${t.name}<br><span style="font-size:11px; color:var(--muted);">${t.subCategory}</span></td>
+                      <td><span class="badge ${t.categoryType === 'BloodTest' ? 'badge-collected' : 'badge-testing'}">${t.categoryType}</span></td>
+                      <td>${t.categoryType === 'BloodTest' ? `${t.min} - ${t.max} ${t.unit}` : 'Clinical Notes'}</td>
+                      <td><button class="btn btn-outline btn-sm" onclick="deleteCatalogTest(${idx})">Delete</button></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Add New Test Category &amp; Reference Values</span>
+            </div>
+            <form onsubmit="addCatalogTest(event)">
+              <div class="form-group">
+                <label class="form-label">C# Inheritance Category *</label>
+                <select id="catTypeInput" class="form-control" onchange="toggleRefInputs()">
+                  <option value="BloodTest">BloodTest (Numeric Reference Ranges)</option>
+                  <option value="ImagingTest">ImagingTest (Radiology / Clinical Findings)</option>
+                </select>
+              </div>
+              <div class="grid-equal-2">
+                <div class="form-group">
+                  <label class="form-label">Test Code *</label>
+                  <input type="text" id="catCodeInput" class="form-control" placeholder="e.g., BIO-GLU" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Sub-Category *</label>
+                  <input type="text" id="catSubInput" class="form-control" placeholder="e.g., Biochemistry" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Test Name *</label>
+                <input type="text" id="catNameInput" class="form-control" placeholder="e.g., Fasting Blood Glucose" required />
+              </div>
+              <div id="refRangeFields">
+                <div class="grid-equal-2">
+                  <div class="form-group">
+                    <label class="form-label">Min Standard Value</label>
+                    <input type="number" step="0.01" id="catMinInput" class="form-control" placeholder="e.g., 70" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Max Standard Value</label>
+                    <input type="number" step="0.01" id="catMaxInput" class="form-control" placeholder="e.g., 100" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Unit of Measurement</label>
+                  <input type="text" id="catUnitInput" class="form-control" placeholder="e.g., mg/dL" />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary w-full">Save Test to Catalog</button>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleRefInputs() {
+      const type = document.getElementById('catTypeInput').value;
+      document.getElementById('refRangeFields').classList.toggle('hidden', type !== 'BloodTest');
+    }
+
+    function addCatalogTest(e) {
+      e.preventDefault();
+      const categoryType = document.getElementById('catTypeInput').value;
+      const code = document.getElementById('catCodeInput').value.trim().toUpperCase();
+      const subCategory = document.getElementById('catSubInput').value.trim();
+      const name = document.getElementById('catNameInput').value.trim();
+      const min = categoryType === 'BloodTest' ? parseFloat(document.getElementById('catMinInput').value) : null;
+      const max = categoryType === 'BloodTest' ? parseFloat(document.getElementById('catMaxInput').value) : null;
+      const unit = categoryType === 'BloodTest' ? document.getElementById('catUnitInput').value.trim() : 'N/A';
+
+      state.testCatalog.push({ code, name, categoryType, subCategory, min, max, unit });
+      showToast(`Added ${name} (${code}) to Test Catalog.`);
+      renderAdminCatalog(document.getElementById('workspaceContent'));
+    }
+
+    function deleteCatalogTest(idx) {
+      state.testCatalog.splice(idx, 1);
+      showToast('Removed test from catalog.');
+      renderAdminCatalog(document.getElementById('workspaceContent'));
+    }
+
+    function renderAdminStaff(container) {
+      container.innerHTML = `
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Diagnostic Center Staff Accounts</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Staff ID</th>
+                    <th>Full Name</th>
+                    <th>Assigned Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${state.staffUsers.map((s, idx) => `
+                    <tr>
+                      <td><strong>${s.id}</strong></td>
+                      <td>${s.name}</td>
+                      <td>${s.role}</td>
+                      <td><span class="badge ${s.active ? 'badge-active' : 'badge-inactive'}">${s.active ? 'Active' : 'Inactive'}</span></td>
+                      <td>
+                        <div class="flex gap-2">
+                          <button class="btn btn-outline btn-sm" onclick="toggleStaffActive(${idx})">${s.active ? 'Deactivate' : 'Activate'}</button>
+                          <button class="btn btn-outline btn-sm" onclick="showToast('Password reset to default (1234) for ${s.id}')">Reset Pass</button>
+                        </div>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Add New Receptionist / Lab Technologist</span>
+            </div>
+            <form onsubmit="addStaffUser(event)">
+              <div class="form-group">
+                <label class="form-label">Role *</label>
+                <select id="staffRoleInput" class="form-control">
+                  <option value="Receptionist">Receptionist</option>
+                  <option value="Lab Technologist">Lab Technologist</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Staff ID *</label>
+                <input type="text" id="staffIdInput" class="form-control" placeholder="e.g., REC-02 or LAB-02" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" id="staffNameInput" class="form-control" placeholder="e.g., Sadia Afrin" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Initial Password *</label>
+                <input type="text" id="staffPassInput" class="form-control" value="1234" required />
+              </div>
+              <button type="submit" class="btn btn-primary w-full">Create Staff Account</button>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    function addStaffUser(e) {
+      e.preventDefault();
+      const role = document.getElementById('staffRoleInput').value;
+      const id = document.getElementById('staffIdInput').value.trim().toUpperCase();
+      const name = document.getElementById('staffNameInput').value.trim();
+      state.staffUsers.push({ id, name, role, active: true });
+      showToast(`Created ${role} account for ${name} (${id}).`);
+      renderAdminStaff(document.getElementById('workspaceContent'));
+    }
+
+    function toggleStaffActive(idx) {
+      state.staffUsers[idx].active = !state.staffUsers[idx].active;
+      renderAdminStaff(document.getElementById('workspaceContent'));
+    }
+
+    // =========================================================
+    // PATIENT PORTAL VIEWS
+    // =========================================================
+    function renderPatientTracking(container) {
+      const myOrders = state.sampleOrders.filter(o => o.patientId === state.patientPortalId);
+      const currentPatient = state.patients.find(p => p.id === state.patientPortalId);
+
+      container.innerHTML = `
+        <div class="card mb-4">
+          <div class="flex items-center justify-between" style="flex-wrap:wrap; gap:12px;">
+            <div>
+              <div style="font-size:16px; font-weight:800;">Welcome, ${currentPatient?.name || 'Patient'}</div>
+              <div style="font-size:12.5px; color:var(--muted);">Patient ID: <strong>${state.patientPortalId}</strong> • Track your real-time pathology sample progress below.</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span style="font-size:12px; color:var(--muted);">Preview Patient:</span>
+              <select class="form-control" style="width:220px;" onchange="switchPreviewPatient(this.value)">
+                ${state.patients.map(p => `<option value="${p.id}" ${p.id === state.patientPortalId ? 'selected' : ''}>${p.id} (${p.name})</option>`).join('')}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        ${myOrders.map(o => {
+          const test = state.testCatalog.find(t => t.code === o.testCode);
+          const stepIndex = { 'Collected': 1, 'Testing': 2, 'Ready': 3, 'Doctor Approved': 4 }[o.status] || 1;
+          return `
+            <div class="card mb-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span style="font-weight:800; font-size:15px;">${test?.name}</span>
+                  <span style="font-size:12px; color:var(--muted); margin-left:8px;">Barcode: <strong>${o.barcodeId}</strong></span>
+                </div>
+                ${getStatusBadge(o.status)}
+              </div>
+
+              <div class="stepper">
+                ${['Collected', 'In Lab Testing', 'Under Doctor Review', 'Report Ready'].map((label, idx) => {
+                  const num = idx + 1;
+                  const cls = num < stepIndex ? 'done' : (num === stepIndex ? 'current' : '');
+                  return `
+                    <div class="step ${cls}">
+                      <div class="step-circle">${num < stepIndex ? '✓' : num}</div>
+                      <div class="step-label">${label}</div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+
+              ${o.status === 'Doctor Approved' ? `
+                <div style="text-align:right;">
+                  <button class="btn btn-primary btn-sm" onclick="openReportModal('${o.barcodeId}')">View &amp; Print Official Report</button>
+                </div>
+              ` : `<div style="font-size:12px; color:var(--muted); text-align:center;">Your report will unlock automatically once verified and signed off by the Doctor.</div>`}
+            </div>
+          `;
+        }).join('')}
+      `;
+    }
+
+    function switchPreviewPatient(patId) {
+      state.patientPortalId = patId;
+      renderPatientTracking(document.getElementById('workspaceContent'));
+    }
+
+    function renderPatientReports(container) {
+      const approved = state.sampleOrders.filter(o => o.patientId === state.patientPortalId && o.status === 'Doctor Approved');
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">My Doctor-Approved Diagnostic Reports</span>
+            <span class="badge badge-approved">${approved.length} Verified Reports</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sample Barcode</th>
+                  <th>Test Name</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${approved.length === 0 ? `<tr><td colspan="5" style="text-align:center; color:var(--muted);">No approved reports yet. Pending lab tests remain hidden until Doctor sign-off.</td></tr>` :
+                  approved.map(o => {
+                    const test = state.testCatalog.find(t => t.code === o.testCode);
+                    return `
+                      <tr>
+                        <td><strong>${o.barcodeId}</strong></td>
+                        <td>${test?.name}</td>
+                        <td>${o.createdAt}</td>
+                        <td><span class="badge badge-approved">Doctor Approved</span></td>
+                        <td>
+                          <button class="btn btn-primary btn-sm" onclick="openReportModal('${o.barcodeId}')">Open Printable Report</button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================
+    // PRINTABLE DIAGNOSTIC REPORT MODAL
+    // =========================================================
+    function openReportModal(barcodeId) {
+      const order = state.sampleOrders.find(o => o.barcodeId === barcodeId);
+      const pat = state.patients.find(p => p.id === order.patientId);
+      const test = state.testCatalog.find(t => t.code === order.testCode);
+
+      const sheet = document.getElementById('reportSheetContent');
+      sheet.innerHTML = `
+        <div class="report-top">
+          <div class="flex items-center gap-3">
+            <div class="brand-logo-box" style="box-shadow:none;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+            <div>
+              <div style="font-size:20px; font-weight:800; color:var(--navy);">MEDITRACK DIAGNOSTIC CENTER</div>
+              <div style="font-size:12px; color:var(--muted);">Pathology &amp; Imaging Laboratory • Automated Sample Tracking</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            ${renderBarcodeSvg(order.barcodeId, 130, 36)}
+            <div style="font-size:11.5px; font-weight:700; margin-top:2px;">Sample ID: ${order.barcodeId}</div>
+          </div>
+        </div>
+
+        <div style="text-align:center; font-weight:800; font-size:15px; letter-spacing:1px; margin-bottom:14px; color:var(--primary);">
+          OFFICIAL DIAGNOSTIC LABORATORY REPORT
+        </div>
+
+        <div class="report-patient-box">
+          <div><span style="color:var(--muted);">Patient Name:</span><br><strong>${pat?.name}</strong></div>
+        <table style="border:1px solid var(--border); margin-bottom:20px;">
+          <thead>
+            <tr>
+              <th>Test Investigation</th>
+              <th>Observed Result</th>
+              <th>Reference Interval</th>
+              <th>Clinical Flag</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>${test?.name}</strong><br><span style="font-size:11px; color:var(--muted);">Code: ${test?.code}</span></td>
+              <td><strong>${test.categoryType === 'BloodTest' ? `${order.numericResult} ${test.unit}` : order.imagingNotes}</strong></td>
+              <td>${test.categoryType === 'BloodTest' ? `${test.min} - ${test.max} ${test.unit}` : 'Qualitative Review'}</td>
+              <td>${getFlagBadge(order.flag)}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        ${order.imagingDataUrl ? `
+          <div style="margin-bottom:24px; padding:14px; border:1px solid var(--border); border-radius:10px; background:#F8FAFC;">
+            <div style="font-size:12px; font-weight:700; color:var(--slate); margin-bottom:8px;">ATTACHED DIAGNOSTIC IMAGING SCAN (${order.imagingFileName})</div>
+            <img src="${order.imagingDataUrl}" alt="Diagnostic Scan" style="max-height:220px; border-radius:8px; border:1px solid #CBD5E1; display:block;" />
+          </div>
+        ` : ''}
+
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:40px; padding-top:16px; border-top:1px solid var(--border);">
+          <div style="font-size:11.5px; color:var(--muted);">
+            Electronically verified via MediTrack Lab Management System.<br>
+            No physical signature required when stamped.
+          </div>
+          <div style="text-align:center;">
+            <div class="signature-stamp">APPROVED &amp; SIGNED</div>
+            <div style="font-weight:800; font-size:13px;">${order.approvedBy || 'Dr. Chief Pathologist'}</div>
+            <div style="font-size:11px; color:var(--muted);">Consultant Pathologist &amp; Lab Director</div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('reportModal').classList.remove('hidden');
+    }
+
+    function closeReportModal() {
+      document.getElementById('reportModal').classList.add('hidden');
+    }
+
+    // =========================================================
+    // HELPERS & SVG GENERATORS
+    // =========================================================
+    function getStatusBadge(status) {
+      const cls = {
+        'Collected': 'badge-collected',
+        'Testing': 'badge-testing',
+        'Ready': 'badge-ready',
+        'Doctor Approved': 'badge-approved'
+      }[status] || 'badge-collected';
+      return `<span class="badge ${cls}">${status}</span>`;
+    }
+
+    function getFlagBadge(flag) {
+      if (flag === 'High (H)') return `<span class="badge badge-high">High (H)</span>`;
+      if (flag === 'Low (L)') return `<span class="badge badge-low">Low (L)</span>`;
+      if (flag === 'Normal' || flag === 'Reviewed') return `<span class="badge badge-normal">${flag}</span>`;
+      return `<span class="badge" style="background:#F1F5F9; color:#64748B;">${flag}</span>`;
+    }
+
+    function renderBarcodeSvg(text, w, h) {
+      const bars = [2,1,3,1,2,4,1,2,1,3,2,1,4,1,2,3,1,2,1,3,2,1];
+      let x = 2;
+      let rects = '';
+      for (let i = 0; i < bars.length; i++) {
+        const bw = bars[i];
+        if (i % 2 === 0) {
+          rects += `<rect x="${x}" y="0" width="${bw}" height="${h}" fill="#0F172A"/>`;
+        }
+        x += bw + 1.5;
+      }
+      return `<svg width="${w}" height="${h}" viewBox="0 0 ${x} ${h}">${rects}</svg>`;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3200);
+    }
+
+    function getIconSvg(name) {
+      const icons = {
+        users: '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        barcode: '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M11 8v8M15 8v8M18 8v8"/></svg>',
+        file: '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+        flask: '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-4 8a2 2 0 0 0 1.8 3h8.4a2 2 0 0 0 1.8-3l-4-8V3"/></svg>',
+        check: '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+        grid: '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+        shield: '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+        list: '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+        box: '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
+        activity: '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
+      };
+      return icons[name] || '';
+    }
+  </script>
+</body>
+</html>
